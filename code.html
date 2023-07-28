@@ -30,7 +30,7 @@
             <div class="container-fluid">
                 <a class="navbar-brand" href="/index.html">
                     <img src="/img/mark.svg" height="50" alt="developer logo">
-                    App Name</a>
+                    Movie List</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
@@ -69,27 +69,134 @@
             <div class="col-12 col-lg-8">
                 <pre class="line-numbers">
                     <code class="language-js">
-                        function displayMessage() {
-                            let inputbox = document.getElementById('message');
-                        
-                            let message = inputbox.value;
+                        const API_KEY = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4OThkMWE4NGE1MWY3YWNiOTc0MjgzZTUyYWFjZWRlMCIsInN1YiI6IjY0YzE2ODVkZGI0ZWQ2MDEzYmYzNmJhZiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.cFFIhtrrNbBuSvSMm_kYQ4Y7hBaFAyvoWNZ5YRx7sVw'
+                        // https://api.themoviedb.org/3/movie/popular
                         
                         
-                            Swal.fire(
-                                {
-                                    backdrop: false,
-                                    title: 'App Name',
-                                    text: message
-                                }
-                            )
+                        async function getMovies() {
+                        
+                            try {
+                        
+                                let response = await fetch('https://api.themoviedb.org/3/movie/popular', {
+                                    headers: {
+                                        'Authorization': `Bearer ${API_KEY}`
+                                    }
+                                });
+                        
+                                let data = await response.json();
+                        
+                                return data;
+                        
+                            } catch (error) {
+                        
+                                console.error(error);
+                        
+                            }
                         }
+                        
+                        async function getMovieDetails(movieId) {
+                        
+                            try {
+                        
+                                let response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}`, {
+                                    headers: {
+                                        'Authorization': `Bearer ${API_KEY}`
+                                    }
+                                });
+                        
+                                let data = await response.json();
+                        
+                                return data;
+                        
+                            } catch (error) {
+                        
+                                console.error(error);
+                        
+                            }
+                        }
+                        async function displayMovies() {
+                            const movieListDiv = document.getElementById('movie-list');
+                            const moviePosterTemplate = document.getElementById("movie-card-template");
+                        
+                            let data = await getMovies();
+                            
+                        
+                            let movies = data.results;
+                        
+                            movies.forEach(movie => {
+                                let movieCard = moviePosterTemplate.content.cloneNode(true);
+                        
+                                let titleElement = movieCard.querySelector('.card-body > h5');
+                                titleElement.textContent = movie.title;
+                        
+                                let movieParagraphElement = movieCard.querySelector('.card-text');
+                                movieParagraphElement.textContent = movie.overview;
+                        
+                                let movieImgElement = movieCard.querySelector('.card-img-top');
+                                movieImgElement.setAttribute('src', `https://image.tmdb.org/t/p/w500${movie.poster_path}`);
+                        
+                        
+                                let infoButton = movieCard.querySelector('button.btn');
+                                infoButton.setAttribute('id', movie.id );
+                        
+                        
+                                movieListDiv.appendChild(movieCard);
+                        
+                        
+                            });
+                        
+                        
+                        }
+                        
+                        
+                        
+                         
+                        async function showMovieDetails(btn) {
+                        
+                            let movieId = btn.getAttribute('id');
+                        
+                            let movieDetails = await getMovieDetails(movieId);
+                        
+                            document.getElementById('modal-movie-title').textContent = movieDetails.title;
+                            document.getElementById('modal-img').src =`https://image.tmdb.org/t/p/w500${movieDetails.poster_path}`;
+                            document.getElementById('modal-paragraph').textContent = movieDetails.overview;
+                            document.getElementById('modal-genre').textContent = movieDetails.genre;
+                        }
+                        
+                        
+                        
                     </code>
                 </pre>
             </div>
             <div class="col-12 col-lg-4">
-                <p>The Code is structured in one funtion</p>
-                <h5>displayMessage</h5>
-                <p>Shows a Sweetalert with the value of the <code>message</code> variable
+                <p>The Code is structured in three funtions.</p>
+                <h5 class="mb-3">getMovies</h5>
+                <p>This function gathers the information from an out API and returns its data. "async function getMovies()" 
+                    defined an asyncronous function named "getMovies". This function declares a varaible named "response" which will 
+                    use the link provided and travel to that destination and using 'Authorization': `Bearer ${API_KEY}` which is a 
+                    constant declared at the top of the page, to access the data stored at the link. Response uses the "await" keyword
+                    so that it can wait for the response from the fetch function which can take longer than a standard function. This allows the rest of code
+                    to run under a promise that the value will be fufilled in the future and prevents the page from having to wait for 
+                    the function to run before it can execute any other code. " let data = await response.json();" creates a new variable 
+                    named data which also contains the keyword "await" to wait for the response varaible to gather the data. Because the data 
+                    is structured using Json, ".json()" reformats the data into valid Javascript. This then returns data as the properties of the 
+                    of the function. The Try block that the fetch function is in is used to wrap the code that could have an error. The catch
+                    block executes another line of code if the try block functions return an error.
+                </p>
+                <h5 class="mb-3">getMovieDetails</h5>
+                <p>This function is structred and functions almost exactly like the getMovies function but with a few small 
+                    differences. Mainly that the link used is for a different API used to gather further data about the movies.
+                    let response = await fetch (`https://api.themoviedb.org/3/movie/${movieId}` requires you to use a template 
+                    literal so you can modify the properties of the string. By modifying the string you can assign it the parameter 
+                    of "movieId" which is gathered and used in other functions to change the movie from which you gather details from.
+                </p>
+                <h5 class="mb-3">displayMovies</h5>
+                <p>This function is responsible for displaying the movies onto the page in the form of 20 cards.
+                    First  const movieListDiv = document.getElementById('movie-list'); creates a variable named movieListDiv that 
+                    gets the HTML element with the id of "movie-list" which is a div in which all the cards will be placed on the page.
+                    Then by we created another variable named moviePosterTemplate by using const moviePosterTemplate = document.getElementById("movie-card-template");
+                    which is the id assigned to the template element in HTML which will serves as the blueprint in which all other cards will 
+                    use. 
                 </p>
             </div>
         </div>
@@ -101,11 +208,13 @@
                 <div class="col text-lg-start">
                     &copy; 2023 Jonathan Chavez
                 </div>
-                <div class="footerLogoText ms-5">
-                    Jonathan Chavez
-                    <span>
-                        <img src="/img/mark.svg" alt="Jonathan Chavez dev Logo" class="mainLogo" />
-                    </span>
+                <div class="col">
+                    <div class="footerLogoText ms-5">
+                        Jonathan Chavez
+                        <span>
+                            <img src="/img/mark.svg" alt="Jonathan Chavez dev Logo" class="mainLogo" />
+                        </span>
+                    </div>
                 </div>
                 <div class="col text-lg-end">
                     <a href="#"><i class="socialIcons bi bi-linkedin"></i> </a>
