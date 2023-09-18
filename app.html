@@ -23,7 +23,7 @@
     <link rel="stylesheet" href="/css/site.css">
 </head>
 
-<body>
+<body onload="displayMovies()">
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark ">
             <div class="container-fluid">
@@ -62,8 +62,7 @@
         </nav>
     </header>
 
-    <main class="container-xxl py-3">
-        <button class="btn btn-primary" onclick="displayMovies()">Get Movies</button>
+    <main class="container py-3">
         <h1 class="text-center py-5 display-3">Trending Movies</h1>
         <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-3 justify-content-center justify-content-xl-start"
             id="movie-list">
@@ -125,10 +124,10 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                     </button>
                 </div>
-                <div class="modal-body container-fluid">
-                    <div class="row row-cols-1 row-cols-lg-2 ">
+                <div class="modal-body container-fluid border border-1 ">
+                    <div class="row row-cols-sm-1  row-cols-md-2 ">
                         <div class="col">
-                            <img id="modal-img" class="" src="" alt="movie poster"/>
+                            <img id="modal-img" class="img-fluid movie-Img " src="" alt="movie poster"/>
                         </div>
                         <div class="col">
                             <h5 class="border-bottom border-dark-subtle">About</h5>
